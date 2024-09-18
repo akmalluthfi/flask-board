@@ -1,6 +1,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,flask,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,flask,linux
 
+# Additional
+*.sqlite
+*.sqlite3
+
 ### Flask ###
 instance/*
 !instance/.gitignore
