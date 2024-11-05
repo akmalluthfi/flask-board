@@ -1,14 +1,15 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} 
 
 {% block header %}
-  <h2>{% block title %}Posts{% endblock title %}</h2>
-{% endblock header %}
+<h2>{% block title %}Posts{% endblock title %}</h2>
+{% endblock header %} 
 
-{% block content %}
+{% block content %} 
   {% for post in posts %}
     <article>
-      <p class="message">{{ post["message"] }}<p>
-      <aside>Posted by {{ post["author"] }} on {{ post["created"].strftime("%b %d, %Y at %I:%M%p") }}</aside>
+      <p class="message">{{ post[1] }}</p>
+      <p></p>
+      <aside>Posted by {{ post[0] }} on {{ post[2] }}</aside>
     </article>
-  {% endfor %}
+  {% endfor %} 
 {% endblock content %}

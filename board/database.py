@@ -1,19 +1,53 @@
 import sqlite3
 import click
 from flask import current_app, g
+import psycopg
+
 
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
 
+
+def close_db(e=None):
+    db = g.pop("db", None)
+
+    if db is not None:
+        db.close()
+
+
 @click.command("init-db")
 def init_db_command():
-    db = get_db()
+    conn = psycopg.connect(
+        host=current_app.config["DB_HOST"],
+        dbname=current_app.config["DB_DATABASE"],
+        user=current_app.config["DB_USERNAME"],
+        password=current_app.config["DB_PASSWORD"],
+        port=current_app.config["DB_PORT"],
+    )
 
-    with current_app.open_resource("schema.sql") as f:
-        db.executescript(f.read().decode("utf-8"))
+    cur = conn.cursor()
+    cur.execute(
+        """
+        DROP TABLE IF EXISTS posts;
+        """
+    )
+    cur.execute(
+        """
+        CREATE TABLE posts (
+            id serial PRIMARY KEY,
+            created DATE DEFAULT CURRENT_DATE,
+            author TEXT NOT NULL,
+            message TEXT NOT NULL
+        );
+        """
+    )
 
+    conn.commit()
+    cur.close()
+    conn.close()
     click.echo("You successfully initialized the database!")
+
 
 def get_db():
     if "db" not in g:
@@ -25,5 +59,13 @@ def get_db():
 
     return g.db
 
-def close_db(e):
-    return g.pop if g else None
+
+def get_pg_db_conn():
+    conn = psycopg.connect(
+        host=current_app.config["DB_HOST"],
+        dbname=current_app.config["DB_DATABASE"],
+        user=current_app.config["DB_USERNAME"],
+        password=current_app.config["DB_PASSWORD"],
+        port=current_app.config["DB_PORT"],
+    )
+    return conn
